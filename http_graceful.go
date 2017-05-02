@@ -2,9 +2,9 @@ package graceful
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
-	"net/http"
 	"time"
 
 	"github.com/pkg/errors"
