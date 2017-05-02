@@ -1,17 +1,13 @@
-package http
+package graceful
 
 import (
-	"context"
 	"net/http"
-	"os"
-	"os/signal"
 	"time"
 	"crypto/tls"
-	"github.com/pkg/errors"
 )
 
-func NewCloudflareBestPracticeServer() *http.Server {
-	return http.Server{
+func NewHTTPServerWithCloudflareBestPractices() *http.Server {
+	return &http.Server{
 		TLSConfig: &tls.Config{
 			PreferServerCipherSuites: true,
 			CurvePreferences: []tls.CurveID{
@@ -37,20 +33,4 @@ func NewCloudflareBestPracticeServer() *http.Server {
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
-}
-
-func RunServerGracefully(srv *http.Server, runner func()) error {
-	stopChan := make(chan os.Signal)
-	signal.Notify(stopChan, os.Interrupt)
-
-	go runner()
-
-	<-stopChan // wait for SIGINT
-	timer, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-	defer cancel()
-	if err := srv.Shutdown(timer); err != nil {
-		errors.WithStack(err)
-	}
-
-	return nil
 }
