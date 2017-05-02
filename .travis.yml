@@ -14,7 +14,7 @@ install:
 
 script:
   - ./ci-lint.sh
-  - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
+  - gotestcover -coverprofile="cover.out" -covermode="count" $(go list ./... | grep -v /vendor/)
 
 after_success:
   - goveralls -coverprofile="cover.out"
