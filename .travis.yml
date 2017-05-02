@@ -13,9 +13,7 @@ install:
   - glide install
 
 script:
-  - goimports -d $(glide novendor)
-  - go vet $(glide novendor)
-  - golint $(glide novendor)
+  - ./ci-lint.sh
   - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
 
 after_success:
