@@ -58,7 +58,7 @@ func TestGracefullyRunHTTPServer(t *testing.T) {
 			}))
 		}()
 
-		_, err := http.Get("http://127.0.0.1:54931/")
+		_, err := http.Get("http://127.0.0.1:54932/")
 		server.stopChan <- os.Interrupt
 		require.Error(t, err)
 	})
