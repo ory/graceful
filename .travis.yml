@@ -1,0 +1,21 @@
+language: go
+
+go:
+  - tip
+  - 1.8
+
+matrix:
+  allow_failures:
+    - go: tip
+
+install:
+  - go get github.com/mattn/goveralls golang.org/x/tools/cmd/cover github.com/pierrre/gotestcover github.com/Masterminds/glide
+  - glide install
+
+script:
+  - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
+
+after_success:
+  - go vet -x $(go list ./... | grep -v /vendor/)
+  - golint $(go list ./... | grep -v /vendor/)
+  - goveralls -coverprofile="cover.out"
