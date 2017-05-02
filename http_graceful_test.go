@@ -23,7 +23,7 @@ func (s *testServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 func TestGracefullyRunHTTPServer(t *testing.T) {
 	t.Run("case=in-time", func(t *testing.T) {
 		server := PatchHTTPServerWithCloudflareConfig(&http.Server{
-			Addr:    ":54931",
+			Addr:    "localhost:54931",
 			Handler: &testServer{timeout: time.Second * 3},
 		})
 
@@ -33,7 +33,7 @@ func TestGracefullyRunHTTPServer(t *testing.T) {
 			}))
 		}()
 
-		res, err := http.Get("http://127.0.0.1:54931/")
+		res, err := http.Get("http://localhost:54931/")
 
 		server.stopChan <- os.Interrupt
 
@@ -48,7 +48,7 @@ func TestGracefullyRunHTTPServer(t *testing.T) {
 
 	t.Run("case=timeout", func(t *testing.T) {
 		server := PatchHTTPServerWithCloudflareConfig(&http.Server{
-			Addr:    ":54932",
+			Addr:    "localhost:54932",
 			Handler: &testServer{timeout: time.Second * 10},
 		})
 
@@ -58,7 +58,7 @@ func TestGracefullyRunHTTPServer(t *testing.T) {
 			}))
 		}()
 
-		_, err := http.Get("http://127.0.0.1:54932/")
+		_, err := http.Get("http://localhost:54932/")
 		server.stopChan <- os.Interrupt
 		require.Error(t, err)
 	})
