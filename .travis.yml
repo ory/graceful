@@ -19,6 +19,4 @@ script:
   - gotestcover -coverprofile="cover.out" -race -covermode="count" $(go list ./... | grep -v /vendor/)
 
 after_success:
-  - go vet -x $(go list ./... | grep -v /vendor/)
-  - golint $(go list ./... | grep -v /vendor/)
   - goveralls -coverprofile="cover.out"
