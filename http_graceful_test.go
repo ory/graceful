@@ -23,7 +23,7 @@ func (s *testServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 func TestGracefullyRunHTTPServer(t *testing.T) {
 	t.Run("case=in-time", func(t *testing.T) {
 		server := PatchHTTPServerWithCloudflareConfig(&http.Server{
-			Addr:":54931",
+			Addr:    ":54931",
 			Handler: &testServer{timeout: time.Second * 3},
 		})
 
@@ -48,7 +48,7 @@ func TestGracefullyRunHTTPServer(t *testing.T) {
 
 	t.Run("case=timeout", func(t *testing.T) {
 		server := PatchHTTPServerWithCloudflareConfig(&http.Server{
-			Addr:":54932",
+			Addr:    ":54932",
 			Handler: &testServer{timeout: time.Second * 10},
 		})
 

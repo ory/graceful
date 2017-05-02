@@ -5,9 +5,10 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/pkg/errors"
-	"time"
 	"net/http"
+	"time"
+
+	"github.com/pkg/errors"
 )
 
 // HTTPServer is a wrapper for http.Server and makes running a graceful http server easy.
@@ -15,7 +16,7 @@ type HTTPServer struct {
 	// ShutdownTimeout defines how long the server will wait before the shutdown is forced.
 	ShutdownTimeout time.Duration
 
-	stopChan        chan os.Signal
+	stopChan chan os.Signal
 	*http.Server
 }
 

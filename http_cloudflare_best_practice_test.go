@@ -1,11 +1,12 @@
 package graceful
 
 import (
-	"net/http"
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"crypto/tls"
 	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPatchHTTPServerWithCloudflareConfig(t *testing.T) {
@@ -14,9 +15,9 @@ func TestPatchHTTPServerWithCloudflareConfig(t *testing.T) {
 		&http.Server{
 			TLSConfig: &tls.Config{
 				PreferServerCipherSuites: false,
-				CurvePreferences:  []tls.CurveID{},
-				MinVersion: tls.VersionTLS10,
-				CipherSuites: []uint16{},
+				CurvePreferences:         []tls.CurveID{},
+				MinVersion:               tls.VersionTLS10,
+				CipherSuites:             []uint16{},
 			},
 		},
 	} {

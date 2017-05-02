@@ -28,9 +28,9 @@ var cfCipherSuites = []uint16{
 
 var cfTLSConfig = &tls.Config{
 	PreferServerCipherSuites: true,
-	CurvePreferences: cfCurves,
-	MinVersion: tls.VersionTLS12,
-	CipherSuites: cfCipherSuites,
+	CurvePreferences:         cfCurves,
+	MinVersion:               tls.VersionTLS12,
+	CipherSuites:             cfCipherSuites,
 }
 
 // PatchHTTPServerWithCloudflareConfig patches a http.Server based on a best practice configuration
@@ -58,7 +58,7 @@ func PatchHTTPServerWithCloudflareConfig(srv *http.Server) *HTTPServer {
 	}
 
 	return &HTTPServer{
-		Server: srv,
+		Server:          srv,
 		ShutdownTimeout: 5 * time.Second,
 		stopChan:        make(chan os.Signal),
 	}
