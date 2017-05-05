@@ -22,21 +22,23 @@ go get github.com/ory/graceful
 ```go
 package main
 
-import "github.com/ory/graceful"
-import "net/http"
+import (
+    "net/http"
+    "log"
+
+    "github.com/ory/graceful"
+)
 
 func main() {
-    server := graceful.PatchHTTPServerWithCloudflareConfig(&http.Server{
+    server := graceful.WithDefaults(&http.Server{
         Addr: ":54932",
         // Handler: someHandler,
     })
 
-    if err := server.Graceful(func () {
-        if err := server.ListenAndServe(); err != nil {
-            // ...
-        }
-    }); err != nil {
-        // ...
+    log.Println("main: Starting the server")
+    if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+        log.Fatalln("main: Failed to gracefully shutdown")
     }
+    log.Println("main: Server was shutdown gracefully")
 }
 ```
