@@ -10,7 +10,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+// StarFunc is the type of the function invoked by Graceful to start the server
 type StartFunc func() error
+
+// ShutdownFunc is the type of the function invoked by Graceful to shutdown the server
 type ShutdownFunc func(context.Context) error
 
 // DefaultShutdownTimeout defines how long Graceful will wait before forcibly shutting down
