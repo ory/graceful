@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPatchHTTPServerWithCloudflareConfig(t *testing.T) {
+func TestWithDefaults(t *testing.T) {
 	for k, tc := range []*http.Server{
 		&http.Server{},
 		&http.Server{
@@ -22,10 +22,10 @@ func TestPatchHTTPServerWithCloudflareConfig(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			server := PatchHTTPServerWithCloudflareConfig(tc)
-			assert.Equal(t, cfCurves, server.TLSConfig.CurvePreferences)
-			assert.Equal(t, cfCipherSuites, server.TLSConfig.CipherSuites)
-			assert.Equal(t, uint16(tls.VersionTLS12), server.TLSConfig.MinVersion)
+			server := WithDefaults(tc)
+			assert.Equal(t, DefaultCurvePreferences, server.TLSConfig.CurvePreferences)
+			assert.Equal(t, DefaultCipherSuites, server.TLSConfig.CipherSuites)
+			assert.Equal(t, DefaultMinVersion, server.TLSConfig.MinVersion)
 			assert.True(t, server.IdleTimeout > 0)
 			assert.True(t, server.ReadTimeout > 0)
 			assert.True(t, server.WriteTimeout > 0)

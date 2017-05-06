@@ -10,35 +10,50 @@ import (
 	"github.com/pkg/errors"
 )
 
-// HTTPServer is a wrapper for http.Server and makes running a graceful http server easy.
-type HTTPServer struct {
-	// ShutdownTimeout defines how long the server will wait before the shutdown is forced.
-	ShutdownTimeout time.Duration
+// StarFunc is the type of the function invoked by Graceful to start the server
+type StartFunc func() error
 
-	stopChan chan os.Signal
-	*http.Server
-}
+// ShutdownFunc is the type of the function invoked by Graceful to shutdown the server
+type ShutdownFunc func(context.Context) error
 
-// Graceful sets up graceful shutdown for the HTTPServer, or returns an error if something goes wrong.
+// DefaultShutdownTimeout defines how long Graceful will wait before forcibly shutting down
+var DefaultShutdownTimeout = 5 * time.Second
+
+// Graceful sets up graceful handling of SIGINT, typically for an HTTP server. When SIGINT is trapped,
+// the shutdown handler will be invoked with a context that expires after DefaultShutdownTimeout (5s).
 //
-//   if err := server.Graceful(server, func () {
-//   	   if err := server.ListenAndServe(); err != nil {
-//		   // ...
-//	   }
-//   }); err != nil {
-//   	   // ..
+//   server := graceful.WithDefaults(http.Server{})
+//
+//   if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+//	   log.Fatal("Failed to gracefully shut down")
 //   }
-func (srv *HTTPServer) Graceful(runner func()) error {
-	signal.Notify(srv.stopChan, os.Interrupt)
+func Graceful(start StartFunc, shutdown ShutdownFunc) error {
+	var (
+		stopChan = make(chan os.Signal)
+		errChan  = make(chan error)
+	)
 
-	go runner()
+	// Setup the graceful shutdown handler (traps SIGINT)
+	go func() {
+		signal.Notify(stopChan, os.Interrupt)
 
-	<-srv.stopChan // wait for SIGINT
-	timer, cancel := context.WithTimeout(context.Background(), srv.ShutdownTimeout)
-	defer cancel()
-	if err := srv.Shutdown(timer); err != nil {
-		return errors.WithStack(err)
+		<-stopChan
+
+		timer, cancel := context.WithTimeout(context.Background(), DefaultShutdownTimeout)
+		defer cancel()
+
+		if err := shutdown(timer); err != nil {
+			errChan <- errors.WithStack(err)
+			return
+		}
+
+		errChan <- nil
+	}()
+
+	// Start the server
+	if err := start(); err != http.ErrServerClosed {
+		return err
 	}
 
-	return nil
+	return <-errChan
 }
