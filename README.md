@@ -4,6 +4,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/ory/graceful/badge.svg?branch=master)](https://coveralls.io/github/ory/graceful?branch=master)
 [![Docs: GoDoc](https://img.shields.io/badge/docs-godoc-blue.svg)](https://godoc.org/github.com/ory/graceful)
 
+[![Join the chat at https://discord.gg/PAMQWkr](https://img.shields.io/badge/join-chat-00cc99.svg)](https://discord.gg/PAMQWkr)
+
 Best practice http server configurations and helpers for Go 1.8's http graceful shutdown feature. Currently supports
 best practice configurations by:
 
