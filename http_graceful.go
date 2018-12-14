@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -39,8 +40,9 @@ type ShutdownFunc func(context.Context) error
 // DefaultShutdownTimeout defines how long Graceful will wait before forcibly shutting down
 var DefaultShutdownTimeout = 5 * time.Second
 
-// Graceful sets up graceful handling of SIGINT, typically for an HTTP server. When SIGINT is trapped,
-// the shutdown handler will be invoked with a context that expires after DefaultShutdownTimeout (5s).
+// Graceful sets up graceful handling of SIGINT and SIGTERM, typically for an HTTP server.
+// When signal is trapped, the shutdown handler will be invoked with a context that expires
+// after DefaultShutdownTimeout (5s).
 //
 //   server := graceful.WithDefaults(http.Server{})
 //
@@ -53,9 +55,9 @@ func Graceful(start StartFunc, shutdown ShutdownFunc) error {
 		errChan  = make(chan error)
 	)
 
-	// Setup the graceful shutdown handler (traps SIGINT)
+	// Setup the graceful shutdown handler (traps SIGINT and SIGTERM)
 	go func() {
-		signal.Notify(stopChan, os.Interrupt)
+		signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
 		<-stopChan
 
