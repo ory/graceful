@@ -7,7 +7,7 @@ with a maintainer, please mention her/him using the `@` syntax (e.g. `@aeneasr`)
 If this change neither resolves an existing issue nor has sign-off from one of the maintainers, there is a
 chance substantial changes will be requested or that the changes will be rejected.
 
-You can discuss changes with maintainers either in the [ORY Community Forums](https://community.ory.sh/) or
+You can discuss changes with maintainers either in the Github Discusssions in this repository or
 join the [ORY Chat](https://www.ory.sh/chat).
 -->
 
@@ -25,14 +25,17 @@ them, don't hesitate to ask. We're here to help! This is simply a reminder of wh
 -->
 
 - [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md)
-- [ ] I have read the [security policy](../security/policy)
+      and signed the CLA.
+- [ ] I have read the [security policy](../security/policy).
 - [ ] I confirm that this pull request does not address a security
       vulnerability. If this pull request addresses a security vulnerability, I
       confirm that I got green light (please contact
       [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push
       the changes.
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] I have added necessary documentation within the code base (if appropriate)
+- [ ] I have added tests that prove my fix is effective or that my feature
+      works.
+- [ ] I have added necessary documentation within the code base (if
+      appropriate).
 
 ## Further comments
 
