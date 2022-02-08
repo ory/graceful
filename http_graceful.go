@@ -57,7 +57,7 @@ func Graceful(start StartFunc, shutdown ShutdownFunc) error {
 
 	// Setup the graceful shutdown handler (traps SIGINT and SIGTERM)
 	go func() {
-		signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
+		signal.Notify(stopChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 		<-stopChan
 
