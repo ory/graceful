@@ -58,6 +58,8 @@ var (
 	// DefaultIdleTimeout sets the maximum amount of time a Keep-Alive connection can remain idle before
 	// being recycled (120s)
 	DefaultIdleTimeout = 120 * time.Second
+	// DefaultReadHeaderTimeout sets the maximum amount of time a client has to fully stream a request header (5s)
+	DefaultReadHeaderTimeout = DefaultReadTimeout
 )
 
 // WithDefaults patches a http.Server based on a best practice configuration
@@ -77,6 +79,10 @@ func WithDefaults(srv *http.Server) *http.Server {
 
 	if srv.ReadTimeout == 0 {
 		srv.ReadTimeout = DefaultReadTimeout
+	}
+
+	if srv.ReadHeaderTimeout == 0 {
+		srv.ReadHeaderTimeout = DefaultReadHeaderTimeout
 	}
 
 	if srv.WriteTimeout == 0 {
