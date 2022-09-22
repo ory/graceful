@@ -9,7 +9,7 @@
 Best practice http server configurations and helpers for Go 1.8's http graceful shutdown feature. Currently supports
 best practice configurations by:
 
-* [Cloudflare](https://blog.cloudflare.com/exposing-go-on-the-internet/)
+- [Cloudflare](https://blog.cloudflare.com/exposing-go-on-the-internet/)
 
 ## Usage
 
