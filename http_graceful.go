@@ -44,11 +44,11 @@ var DefaultShutdownTimeout = 5 * time.Second
 // When signal is trapped, the shutdown handler will be invoked with a context that expires
 // after DefaultShutdownTimeout (5s).
 //
-//   server := graceful.WithDefaults(http.Server{})
+//	server := graceful.WithDefaults(http.Server{})
 //
-//   if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
-//	   log.Fatal("Failed to gracefully shut down")
-//   }
+//	if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+//		log.Fatal("Failed to gracefully shut down")
+//	}
 func Graceful(start StartFunc, shutdown ShutdownFunc) error {
 	var (
 		stopChan = make(chan os.Signal)
