@@ -54,7 +54,7 @@ func ExampleGraceful() {
 	done := make(chan struct{})
 	go func() {
 		fmt.Println("graceful: Starting the server")
-		if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+		if err := graceful.Graceful(server); err != nil {
 			fmt.Println("graceful: Failed to gracefully shutdown")
 			os.Exit(-1)
 		}

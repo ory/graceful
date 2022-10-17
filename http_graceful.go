@@ -31,7 +31,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// StarFunc is the type of the function invoked by Graceful to start the server
+// StartFunc is the type of the function invoked by Graceful to start the server
 type StartFunc func() error
 
 // ShutdownFunc is the type of the function invoked by Graceful to shutdown the server
@@ -46,25 +46,31 @@ var DefaultShutdownTimeout = 5 * time.Second
 //
 //	server := graceful.WithDefaults(http.Server{})
 //
-//	if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+//	if err := graceful.Graceful(server); err != nil {
 //		log.Fatal("Failed to gracefully shut down")
 //	}
-func Graceful(start StartFunc, shutdown ShutdownFunc) error {
+func Graceful(svr *http.Server) error {
 	var (
 		stopChan = make(chan os.Signal)
 		errChan  = make(chan error)
 	)
 
-	// Setup the graceful shutdown handler (traps SIGINT and SIGTERM)
+	ctx, cancel := context.WithCancel(context.Background())
+	svr.RegisterOnShutdown(cancel)
+
+	// Set up the graceful shutdown handler (traps SIGINT and SIGTERM or a cancelled context)
 	go func() {
 		signal.Notify(stopChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-		<-stopChan
+		select {
+		case <-stopChan:
+		case <-ctx.Done():
+		}
 
 		timer, cancel := context.WithTimeout(context.Background(), DefaultShutdownTimeout)
 		defer cancel()
 
-		if err := shutdown(timer); err != nil {
+		if err := svr.Shutdown(timer); err != nil {
 			errChan <- errors.WithStack(err)
 			return
 		}
@@ -73,7 +79,7 @@ func Graceful(start StartFunc, shutdown ShutdownFunc) error {
 	}()
 
 	// Start the server
-	if err := start(); err != http.ErrServerClosed {
+	if err := svr.ListenAndServe(); err != http.ErrServerClosed {
 		return err
 	}
 

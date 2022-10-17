@@ -72,7 +72,6 @@ func WithDefaults(srv *http.Server) *http.Server {
 		srv.TLSConfig = &tls.Config{}
 	}
 
-	srv.TLSConfig.PreferServerCipherSuites = true
 	srv.TLSConfig.MinVersion = DefaultMinVersion
 	srv.TLSConfig.CurvePreferences = DefaultCurvePreferences
 	srv.TLSConfig.CipherSuites = DefaultCipherSuites

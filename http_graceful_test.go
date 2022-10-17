@@ -21,15 +21,12 @@
 package graceful
 
 import (
-	"context"
-	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"syscall"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,7 +47,7 @@ func TestGraceful(t *testing.T) {
 		})
 
 		go func() {
-			require.NoError(t, Graceful(server.ListenAndServe, server.Shutdown))
+			require.NoError(t, Graceful(server))
 		}()
 
 		res, err := http.Get("http://localhost:54931/")
@@ -58,11 +55,11 @@ func TestGraceful(t *testing.T) {
 		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 
 		require.NoError(t, err)
-		assert.Equal(t, http.StatusOK, res.StatusCode)
+		require.Equal(t, http.StatusOK, res.StatusCode)
 
-		all, err := ioutil.ReadAll(res.Body)
+		all, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
-		assert.Equal(t, []byte("hi"), all)
+		require.Equal(t, []byte("hi"), all)
 	})
 
 	t.Run("case=timeout", func(t *testing.T) {
@@ -74,7 +71,7 @@ func TestGraceful(t *testing.T) {
 		// Start the server after 1s
 		done := make(chan error)
 		go func() {
-			done <- Graceful(server.ListenAndServe, server.Shutdown)
+			done <- Graceful(server)
 		}()
 
 		// Kill the server after 1s
@@ -87,18 +84,6 @@ func TestGraceful(t *testing.T) {
 		require.Error(t, err)
 
 		require.Error(t, <-done)
-	})
-
-	t.Run("case=start-error", func(t *testing.T) {
-		startErr := errors.New("Test error")
-
-		start := func() error { return startErr }
-		shutdown := func(c context.Context) error {
-			return nil
-		}
-
-		err := Graceful(start, shutdown)
-		require.Equal(t, startErr, err)
 	})
 
 	time.Sleep(time.Second) // clean up
