@@ -21,6 +21,7 @@
 package graceful
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"syscall"
@@ -68,7 +69,7 @@ func TestGraceful(t *testing.T) {
 			Handler: &testServer{timeout: time.Second * 10},
 		})
 
-		// Start the server after 1s
+		// Start the server
 		done := make(chan error)
 		go func() {
 			done <- Graceful(server)
@@ -84,6 +85,22 @@ func TestGraceful(t *testing.T) {
 		require.Error(t, err)
 
 		require.Error(t, <-done)
+	})
+
+	t.Run("case=shutdown", func(t *testing.T) {
+		server := WithDefaults(&http.Server{
+			Addr: "localhost:54933",
+		})
+
+		// Shutdown the server after 1s
+		go func() {
+			time.Sleep(1 * time.Second)
+			err := server.Shutdown(context.Background())
+			require.NoError(t, err)
+		}()
+
+		err := Graceful(server)
+		require.NoError(t, err)
 	})
 
 	time.Sleep(time.Second) // clean up
