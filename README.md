@@ -38,7 +38,7 @@ func main() {
     })
 
     log.Println("main: Starting the server")
-    if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+    if err := graceful.Graceful(server); err != nil {
         log.Fatalln("main: Failed to gracefully shutdown")
     }
     log.Println("main: Server was shutdown gracefully")
