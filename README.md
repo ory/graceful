@@ -6,8 +6,8 @@
 
 [![Join the chat at https://slack.ory.sh/](https://img.shields.io/badge/join-chat-00cc99.svg)](https://slack.ory.sh/)
 
-Best practice http server configurations and helpers for Go 1.8's http graceful shutdown feature. Currently supports
-best practice configurations by:
+Best practice http server configurations and helpers for Go 1.8's http graceful
+shutdown feature. Currently supports best practice configurations by:
 
 - [Cloudflare](https://blog.cloudflare.com/exposing-go-on-the-internet/)
 
