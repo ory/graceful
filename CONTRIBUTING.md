@@ -47,9 +47,11 @@ contributions and don't want a wall of rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
-won't clash with Ory Graceful's direction. A great way to do this is via
-[Ory Graceful Discussions](https://github.com/orgs/ory/discussions) or the
-[Ory Chat](https://www.ory.sh/chat).
+won't clash with Ory
+Graceful's direction. A great way to
+do this is via
+[Ory Graceful Discussions](https://github.com/orgs/ory/discussions)
+or the [Ory Chat](https://www.ory.sh/chat).
 
 ## FAQ
 
@@ -66,7 +68,8 @@ won't clash with Ory Graceful's direction. A great way to do this is via
 - I want to talk to other Ory Graceful users.
   [How can I become a part of the community?](#communication)
 
-- I would like to know what I am agreeing to when I contribute to Ory Graceful.
+- I would like to know what I am agreeing to when I contribute to Ory
+  Graceful.
   Does Ory have
   [a Contributors License Agreement?](https://cla-assistant.io/ory/graceful)
 
@@ -116,9 +119,8 @@ to help out:
 We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of Ory, etc.
 
-Check out [Ory Graceful Discussions](https://github.com/orgs/ory/discussions).
-This is a great place for in-depth discussions and lots of code examples, logs
-and similar data.
+Check out [Ory Graceful Discussions](https://github.com/orgs/ory/discussions). This is a great place for
+in-depth discussions and lots of code examples, logs and similar data.
 
 You can also join our community calls if you want to speak to the Ory team
 directly or ask some questions. You can find more info and participate in
