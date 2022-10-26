@@ -33,8 +33,8 @@ var DefaultShutdownTimeout = 5 * time.Second
 //	}
 func Graceful(start StartFunc, shutdown ShutdownFunc) error {
 	var (
-		stopChan = make(chan os.Signal)
-		errChan  = make(chan error)
+		stopChan = make(chan os.Signal, 1)
+		errChan  = make(chan error, 1)
 	)
 
 	// Setup the graceful shutdown handler (traps SIGINT and SIGTERM)
