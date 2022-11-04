@@ -1,5 +1,5 @@
 format: .bin/goimports .bin/ory node_modules
-	.bin/ory dev headers copyright
+	.bin/ory dev headers copyright --type=open-source
 	.bin/goimports -w .
 	npm exec -- prettier --write .
 
