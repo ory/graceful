@@ -1,7 +1,9 @@
+authors:  # updates the AUTHORS file
+	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Graceful" bash
+
 format: .bin/goimports .bin/ory node_modules
 	.bin/ory dev headers copyright --type=open-source
 	.bin/goimports -w .
-	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Graceful" bash
 	npm exec -- prettier --write .
 
 licenses: .bin/licenses node_modules  # checks open-source licenses
