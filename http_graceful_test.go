@@ -72,6 +72,31 @@ func TestGraceful(t *testing.T) {
 		require.Error(t, <-done)
 	})
 
+	t.Run("case=canceled", func(t *testing.T) {
+		server := WithDefaults(&http.Server{
+			Addr:    "localhost:54933",
+			Handler: &testServer{timeout: time.Second * 10},
+		})
+
+		ctx, cancel := context.WithCancel(context.Background())
+		// Start the server after 1s
+		done := make(chan error)
+		go func() {
+			done <- GracefulContext(ctx, server.ListenAndServe, server.Shutdown)
+		}()
+
+		// Kill the server after 1s
+		go func() {
+			time.Sleep(1 * time.Second)
+			cancel()
+		}()
+
+		_, err := http.Get("http://localhost:54933/")
+		require.Error(t, err)
+
+		require.Error(t, <-done)
+	})
+
 	t.Run("case=start-error", func(t *testing.T) {
 		startErr := errors.New("Test error")
 
