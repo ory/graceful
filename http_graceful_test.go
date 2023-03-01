@@ -17,11 +17,11 @@ import (
 )
 
 type testServer struct {
-	timeout time.Duration
+	delay time.Duration
 }
 
 func (s *testServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	time.Sleep(s.timeout)
+	time.Sleep(s.delay)
 	rw.Write([]byte("hi"))
 }
 
@@ -29,7 +29,7 @@ func TestGraceful(t *testing.T) {
 	t.Run("case=in-time", func(t *testing.T) {
 		server := WithDefaults(&http.Server{
 			Addr:    "localhost:54931",
-			Handler: &testServer{timeout: time.Second * 3},
+			Handler: &testServer{delay: time.Second * 3},
 		})
 
 		go func() {
@@ -48,13 +48,12 @@ func TestGraceful(t *testing.T) {
 		assert.Equal(t, []byte("hi"), all)
 	})
 
-	t.Run("case=timeout", func(t *testing.T) {
+	t.Run("case=timeout during shutdown", func(t *testing.T) {
 		server := WithDefaults(&http.Server{
 			Addr:    "localhost:54932",
-			Handler: &testServer{timeout: time.Second * 10},
+			Handler: &testServer{delay: time.Second * 10},
 		})
 
-		// Start the server after 1s
 		done := make(chan error)
 		go func() {
 			done <- Graceful(server.ListenAndServe, server.Shutdown)
@@ -69,17 +68,34 @@ func TestGraceful(t *testing.T) {
 		_, err := http.Get("http://localhost:54932/")
 		require.Error(t, err)
 
-		require.Error(t, <-done)
+		require.ErrorIs(t, <-done, context.DeadlineExceeded)
 	})
 
 	t.Run("case=canceled", func(t *testing.T) {
 		server := WithDefaults(&http.Server{
 			Addr:    "localhost:54933",
-			Handler: &testServer{timeout: time.Second * 10},
+			Handler: &testServer{delay: 0},
 		})
 
 		ctx, cancel := context.WithCancel(context.Background())
-		// Start the server after 1s
+		done := make(chan error)
+		go func() {
+			done <- GracefulContext(ctx, server.ListenAndServe, server.Shutdown)
+		}()
+
+		_, err := http.Get("http://localhost:54933/")
+		require.NoError(t, err)
+		cancel()
+		require.NoError(t, <-done)
+	})
+
+	t.Run("case=canceled (timeout during shutdown)", func(t *testing.T) {
+		server := WithDefaults(&http.Server{
+			Addr:    "localhost:54934",
+			Handler: &testServer{delay: time.Second * 10},
+		})
+
+		ctx, cancel := context.WithCancel(context.Background())
 		done := make(chan error)
 		go func() {
 			done <- GracefulContext(ctx, server.ListenAndServe, server.Shutdown)
@@ -91,10 +107,10 @@ func TestGraceful(t *testing.T) {
 			cancel()
 		}()
 
-		_, err := http.Get("http://localhost:54933/")
+		_, err := http.Get("http://localhost:54934/")
 		require.Error(t, err)
 
-		require.Error(t, <-done)
+		require.ErrorIs(t, <-done, context.DeadlineExceeded)
 	})
 
 	t.Run("case=start-error", func(t *testing.T) {
