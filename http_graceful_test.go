@@ -125,5 +125,35 @@ func TestGraceful(t *testing.T) {
 		require.Equal(t, startErr, err)
 	})
 
+	t.Run("case=manual-shutdown", func(t *testing.T) {
+		server := WithDefaults(&http.Server{
+			Addr:    "localhost:54935",
+			Handler: &testServer{delay: 0},
+		})
+
+		done := make(chan error)
+		go func() {
+			done <- Graceful(server.ListenAndServe, server.Shutdown)
+		}()
+
+		require.Eventually(t, func() bool {
+			res, err := http.Get("http://localhost:54935/")
+			if err != nil {
+				return false
+			}
+			_ = res.Body.Close()
+			return res.StatusCode == http.StatusOK
+		}, 2*time.Second, 10*time.Millisecond)
+
+		require.NoError(t, server.Shutdown(context.Background()))
+
+		select {
+		case err := <-done:
+			require.NoError(t, err)
+		case <-time.After(2 * time.Second):
+			t.Fatal("Graceful did not return after http.Server.Shutdown")
+		}
+	})
+
 	time.Sleep(time.Second) // clean up
 }

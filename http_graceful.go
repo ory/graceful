@@ -27,6 +27,9 @@ var DefaultShutdownTimeout = 5 * time.Second
 // When signal is trapped, the shutdown handler will be invoked with a context that expires
 // after DefaultShutdownTimeout (5s).
 //
+// If start returns http.ErrServerClosed (for example because http.Server.Shutdown
+// was called), Graceful returns without waiting for a signal.
+//
 //	server := graceful.WithDefaults(http.Server{})
 //
 //	if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
@@ -43,15 +46,21 @@ func GracefulContext(ctx context.Context, start StartFunc, shutdown ShutdownFunc
 	var (
 		stopChan = make(chan os.Signal, 1)
 		errChan  = make(chan error, 1)
+		done     = make(chan struct{})
 	)
 
 	// Setup the graceful shutdown handler (traps SIGINT and SIGTERM)
 	go func() {
 		signal.Notify(stopChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+		defer signal.Stop(stopChan)
 
 		select {
 		case <-stopChan:
 		case <-ctx.Done():
+		case <-done:
+			// start() already returned (e.g. http.Server.Shutdown was called).
+			errChan <- nil
+			return
 		}
 
 		timer, cancel := context.WithTimeout(context.Background(), DefaultShutdownTimeout)
@@ -66,7 +75,9 @@ func GracefulContext(ctx context.Context, start StartFunc, shutdown ShutdownFunc
 	}()
 
 	// Start the server
-	if err := start(); err != http.ErrServerClosed {
+	err := start()
+	close(done)
+	if err != http.ErrServerClosed {
 		return err
 	}
 
